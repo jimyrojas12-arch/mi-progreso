@@ -281,7 +281,39 @@ function renderFood(){fillFoodSelect();renderMeals();let d=data(),t=totals(), w=
 function removeFood(i){let d=data(),ids=d.foods.map((x,j)=>x.date===today()?j:-1).filter(j=>j>=0);d.foods.splice(ids[i],1);save(d);renderFood()}
 function lastWorkout(){let d=data();return d.workouts.slice().sort((a,b)=>b.date.localeCompare(a.date))[0]}
 function suggested(){let l=lastWorkout();if(!l)return 'Upper A';let m=l.name.startsWith('Upper');if(m)return l.name==='Upper A'?'Lower A':'Lower B';return l.name==='Lower A'?'Upper B':'Upper A'}
-function exerciseKey(n){return n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/de /g,'').replace(/^(prensa) de /,'prensa ').replace(/^(extension) de /,'extension ').trim()}
+function exerciseKey(n){
+ let k=n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
+ k=k.replace(/\bmaquina\b/g,'').replace(/\bde\b/g,'').replace(/\s+/g,' ').trim();
+ const aliases={
+  'press banca plano':'press plano',
+  'press plano':'press plano',
+  'press hombros':'press hombros',
+  'press hombros maquina':'press hombros',
+  'elevacion lateral polea':'elevacion lateral',
+  'elevacion lateral':'elevacion lateral',
+  'curl inclinado mancuerna':'curl inclinado mancuernas',
+  'curl inclinado mancuernas':'curl inclinado mancuernas',
+  'curl banco scott':'curl scott',
+  'curl scott':'curl scott',
+  'extension triceps polea cuerda':'triceps polea',
+  'triceps polea':'triceps polea',
+  'hip thrust':'hip thrust',
+  'hip thrust maquina':'hip thrust',
+  'prensa pierna':'prensa pierna',
+  'prensa pierna':'prensa pierna',
+  'extension pierna':'extension pierna',
+  'jalon pecho':'jalon pecho',
+  'jalon unilateral':'jalon unilateral',
+  'remo sentado':'remo sentado',
+  'remo pecho apoyado':'remo pecho apoyado',
+  'curl femoral acostado':'curl femoral acostado',
+  'super squat':'super squat',
+  'gemelos':'gemelos',
+  'abdominales':'abdominales',
+  'triceps sobre cabeza':'triceps sobre cabeza'
+ };
+ return aliases[k]||k;
+}
 function sameExercise(a,b){return exerciseKey(a)===exerciseKey(b)}
 function readExerciseSets(index){return [...document.querySelectorAll('#sets'+index+' .setrow')].map(r=>({w:+r.querySelector('.sw').value||0,r:+r.querySelector('.sr').value||0})).filter(s=>s.w||s.r)}
 function saveExercise(name,index){let d=data(), def=routines[name][index], sets=readExerciseSets(index).filter(s=>s.w!==''&&s.r!=='');let workout=d.workouts.find(x=>x.date===today()&&x.name===name);if(!workout){workout={date:today(),name,exercises:[]};d.workouts.push(workout)}let ex=workout.exercises.find(x=>sameExercise(x.name,def.name));if(!ex){ex={name:def.name,sets:[]};workout.exercises.push(ex)}ex.sets=sets;workout.updatedAt=new Date().toISOString();save(d);renderDash();startWorkout(name);let st=document.getElementById('saveStatus'+index);if(st){st.textContent='✓ Guardado';st.classList.remove('muted');setTimeout(()=>{let s=document.getElementById('saveStatus'+index);if(s)s.textContent=''},1800)}}
