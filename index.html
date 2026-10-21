@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mi Progreso V13</title>
+<title>Mi Progreso</title>
 <meta name="theme-color" content="#111827">
 <link rel="manifest" href="manifest.json">
 <style>
@@ -207,21 +207,29 @@ const defaultProgress=[
 {date:'2026-10-07',weight:57.0,waist:0,bf:0,steps:0,sleep:0},
 {date:'2026-10-08',weight:56.8,waist:0,bf:0,steps:0,sleep:0},
 {date:'2026-10-09',weight:57.0,waist:0,bf:0,steps:0,sleep:0},
-{date:'2026-10-10',weight:57.1,waist:0,bf:0,steps:0,sleep:0}
+{date:'2026-10-10',weight:57.1,waist:0,bf:0,steps:0,sleep:0},
+{date:'2026-10-11',weight:56.7,waist:0,bf:0,steps:0,sleep:0},
+{date:'2026-10-12',weight:57.0,waist:0,bf:0,steps:0,sleep:0},
+{date:'2026-10-13',weight:56.9,waist:0,bf:0,steps:0,sleep:0},
+{date:'2026-10-14',weight:57.1,waist:0,bf:0,steps:0,sleep:0},
+{date:'2026-10-15',weight:56.9,waist:0,bf:0,steps:0,sleep:0},
+{date:'2026-10-16',weight:56.6,waist:0,bf:0,steps:0,sleep:0},
+{date:'2026-10-17',weight:56.7,waist:0,bf:0,steps:0,sleep:0},
+{date:'2026-10-19',weight:56.8,waist:74,bf:0,steps:0,sleep:0}
 ];
 function data(){let raw=localStorage.getItem(KEY);if(raw)return JSON.parse(raw);let d={foods:[],customFoods:[],workouts:[],progress:defaultProgress};localStorage.setItem(KEY,JSON.stringify(d));return d}
 function save(d){localStorage.setItem(KEY,JSON.stringify(d))}
 function tab(id,b){try{document.querySelectorAll('.app-section').forEach(s=>s.classList.add('hidden'));const sec=document.getElementById(id);if(!sec)throw new Error('Sección no encontrada: '+id);sec.classList.remove('hidden');document.querySelectorAll('#mainNav button').forEach(x=>x.classList.remove('active'));if(b)b.classList.add('active');if(id==='food')renderFood();else if(id==='gym')renderGym();else if(id==='progress')renderProgress();else if(id==='dash')renderDash();else if(id==='share')makeSummary();}catch(e){console.error('TAB',id,e);alert('No se pudo abrir esta sección: '+e.message)}}
 function today(){return new Date().toISOString().slice(0,10)}
-function init(){progDate.value=today();fromDate.value=new Date(Date.now()-6*86400000).toISOString().slice(0,10);toDate.value=today();seedWorkoutHistory();fillFoodSelect();ensureDefaultMeals();renderMeals();renderDash();renderFood();renderGym();renderProgress()}
+function init(){progDate.value=today();fromDate.value=new Date(Date.now()-6*86400000).toISOString().slice(0,10);toDate.value=today();seedWorkoutHistory();seedProgressHistory();fillFoodSelect();ensureDefaultMeals();renderMeals();renderDash();renderFood();renderGym();renderProgress()}
 const defaultMeals={
  'Desayuno':[{name:'Huevo',qty:2,unit:'unidad'},{name:'Gallo pinto',qty:1.5,unit:'taza'},{name:'Plátano frito',qty:90,unit:'g'},{name:'Café',qty:1,unit:'taza'}],
- 'Almuerzo':[{name:'Pechuga de pollo cocida',qty:80,unit:'g'},{name:'Arroz cocido',qty:.75,unit:'taza'},{name:'Frijoles cocidos',qty:.5,unit:'taza'},{name:'Papaya',qty:100,unit:'g'}],
- 'Merienda tarde':[{name:'Huevo',qty:2,unit:'unidad'},{name:'Pan Bimbo integral',qty:2,unit:'rebanada'},{name:'Queso Dos Pinos + Proteína',qty:30,unit:'g'},{name:'Mermelada sin azúcar',qty:15,unit:'g'},{name:'Almendras',qty:15,unit:'g'}],
+ 'Almuerzo':[{name:'Pechuga de pollo cocida',qty:60,unit:'g'},{name:'Arroz cocido',qty:1,unit:'taza'},{name:'Frijoles cocidos',qty:.5,unit:'taza'},{name:'Papaya',qty:100,unit:'g'}],
+ 'Merienda tarde':[{name:'Pan Bimbo integral',qty:2,unit:'rebanada'},{name:'Queso Dos Pinos + Proteína',qty:30,unit:'g'},{name:'Mermelada sin azúcar',qty:15,unit:'g'},{name:'Almendras',qty:15,unit:'g'},{name:'Café',qty:1,unit:'taza'}],
  'Merienda pre entrenamiento':[{name:'Avena',qty:30,unit:'g'},{name:'Proteína en polvo',qty:.5,unit:'scoop'},{name:'Banano',qty:1,unit:'unidad'}],
- 'Cena':[{name:'Pechuga de pollo cocida',qty:80,unit:'g'},{name:'Arroz cocido',qty:.75,unit:'taza'},{name:'Frijoles cocidos',qty:.5,unit:'taza'},{name:'Vegetales',qty:150,unit:'g'}]
+ 'Cena':[{name:'Pechuga de pollo cocida',qty:60,unit:'g'},{name:'Arroz cocido',qty:1,unit:'taza'},{name:'Frijoles cocidos',qty:.5,unit:'taza'},{name:'Vegetales',qty:150,unit:'g'}]
 };
-function ensureDefaultMeals(){let v=localStorage.getItem('miprogreso_meals_version');if(v!=='7'){localStorage.setItem('miprogreso_meals',JSON.stringify(defaultMeals));localStorage.setItem('miprogreso_meals_version','7')}}
+function ensureDefaultMeals(){let v=localStorage.getItem('miprogreso_meals_version');if(v!=='8'){localStorage.setItem('miprogreso_meals',JSON.stringify(defaultMeals));localStorage.setItem('miprogreso_meals_version','8')}}
 function meals(){let m=JSON.parse(localStorage.getItem('miprogreso_meals')||'null');if(!m){m=defaultMeals;localStorage.setItem('miprogreso_meals',JSON.stringify(m))}return m}
 function findFood(name){let d=data();return baseFoods.concat(d.customFoods).find(x=>x.name===name)}
 function calcFood(f,q,unit){if(!f)return null;let factor=1;if(f.base==='100g'&&unit==='g')factor=q/100;else if(f.base==='100ml'&&unit==='ml')factor=q/100;else if(f.refUnit===unit)factor=q/(f.refQty||1);else if(f.unit===unit)factor=q/(f.refQty||1);else factor=q/(f.refQty||1);return {k:f.k*factor,p:f.p*factor,c:f.c*factor,f:f.f*factor}}
@@ -244,9 +252,27 @@ function seedWorkoutHistory(){let d=data();const seed=[
 {date:'2026-10-07',name:'Lower A',exercises:[['Prensa pierna',[['160 lb/side','8'],['160 lb/side','8'],['160 lb/side','8']]],['Curl femoral acostado',[['55 kg','12'],['60 kg','9'],['60 kg','8']]],['Extensión pierna',[['15','11'],['15','10']]],['Hip thrust',[['70 lb/side','12'],['70 lb/side','12']]],['Abdominales',[['—','10'],['—','8']]]]},
 {date:'2026-10-08',name:'Upper A',exercises:[['Press inclinado máquina',[['154 lb','12'],['154 lb','12'],['154 lb','9']]],['Remo pecho apoyado',[['90 lb','12'],['90 lb','11'],['90 lb','9']]],['Jalón al pecho',[['115 lb/side','8'],['115 lb/side','8']]],['Press hombros',[['25 lb/side','15'],['25 lb/side','12']]],['Elevación lateral polea',[['30 lb','8'],['30 lb','8']]],['Curl banco Scott',[['30 lb','8'],['30 lb','8']]],['Extensión tríceps polea cuerda',[['100 lb','10'],['100 lb','9']]]]},
 {date:'2026-10-10',name:'Lower B',exercises:[['Super squat',[['160 lb/side','12'],['160 lb/side','12'],['160 lb/side','12']]],['Curl femoral acostado',[['60 kg','10'],['60 kg','9'],['60 kg','7']]],['Prensa pierna',[['160 lb/side','10'],['160 lb/side','10']]],['Extensión pierna',[['15','12'],['15','12']]],['Gemelos',[['115 lb','12'],['115 lb','12'],['115 lb','12']]],['Abdominales',[['—','—'],['—','—'],['—','—']]]]},
+{date:'2026-10-12',name:'Upper B',exercises:[['Press banca plano',[['40 lb/side','10'],['40 lb/side','10'],['40 lb/side','7']]],['Remo sentado',[['120 lb','12'],['120 lb','11'],['120 lb','8']]],['Jalón unilateral',[['115 lb/side','12'],['115 lb/side','10']]],['Press inclinado máquina',[['154 lb','12'],['154 lb','8']]],['Elevación lateral polea',[['20 lb','16'],['20 lb','15']]],['Curl inclinado mancuerna',[['25 lb','12'],['25 lb','12']]],['Tríceps sobre cabeza',[['70 lb','12'],['70 lb','10']]]]},
+{date:'2026-10-13',name:'Lower A',exercises:[['Prensa pierna',[['160 lb/side','12'],['160 lb/side','10']]],['Curl femoral acostado',[['60 kg','12'],['60 kg','10'],['60 kg','8']]],['Extensión pierna',[['15','12'],['15','12']]],['Hip thrust',[['90 lb/side','8'],['90 lb/side','8']]],['Gemelos',[['115 lb','12'],['115 lb','12']]]]},
+{date:'2026-10-15',name:'Upper A',exercises:[['Press inclinado máquina',[['154 lb','12'],['154 lb','12'],['154 lb','9']]],['Remo pecho apoyado',[['90 lb','12'],['90 lb','12'],['90 lb','10']]],['Jalón al pecho',[['115 lb/side','8'],['115 lb/side','6']]],['Press hombros máquina',[['30 lb/side','12'],['30 lb/side','12']]],['Elevación lateral',[['20 lb','17'],['20 lb','15']]],['Curl Scott',[['30 lb','9'],['30 lb','8']]],['Tríceps polea',[['100 lb','11'],['100 lb','9']]]]},
+{date:'2026-10-16',name:'Lower B',exercises:[['Super squat',[['160 lb/side','12'],['160 lb/side','12'],['160 lb/side','12']]],['Curl femoral acostado',[['60 kg','12'],['60 kg','11'],['60 kg','9']]],['Prensa pierna',[['170 lb/side','12'],['170 lb/side','12']]],['Extensión pierna',[['15','14'],['15','12']]],['Gemelos',[['115 lb','15'],['115 lb','12'],['115 lb','10']]],['Abdominales',[['—','—'],['—','—'],['—','—']]]]},
+{date:'2026-10-20',name:'Upper B',exercises:[['Press inclinado máquina',[['154 lb','12'],['154 lb','12']]],['Jalón unilateral',[['125 lb/side','11'],['125 lb/side','10']]],['Remo sentado',[['120 lb','10'],['120 lb','8'],['120 lb','8']]],['Press banca plano',[['40 lb/side','8'],['40 lb/side','8'],['40 lb/side','6']]],['Elevación lateral polea',[['20 lb','16'],['20 lb','15']]],['Curl inclinado mancuerna',[['30 lb','8'],['25 lb','8']]],['Tríceps sobre cabeza',[['70 lb','10'],['70 lb','10']]]]},
 ];
 for(const s of seed){if(!d.workouts.some(w=>w.date===s.date&&w.name===s.name)){d.workouts.push({date:s.date,name:s.name,exercises:s.exercises.map(([n,ss])=>({name:n,sets:ss.map(([w,r])=>({w:parseFloat(w)||0,r:parseFloat(r)||0,label:w}))}))})}}save(d)}
 
+function seedProgressHistory(){
+ let d=data();
+ for(const item of defaultProgress){
+  const existing=d.progress.find(x=>x.date===item.date);
+  if(!existing){d.progress.push({...item});}
+  else {
+   if((existing.weight===undefined||existing.weight===null||existing.weight===0)&&item.weight)existing.weight=item.weight;
+   if((existing.waist===undefined||existing.waist===null||existing.waist===0)&&item.waist)existing.waist=item.waist;
+   if((existing.bf===undefined||existing.bf===null||existing.bf===0)&&item.bf)existing.bf=item.bf;
+  }
+ }
+ d.progress.sort((a,b)=>a.date.localeCompare(b.date));save(d);
+}
 function fillFoodSelect(){let d=data();let foods=baseFoods.concat(d.customFoods);foodSelect.innerHTML=foods.map((f,i)=>`<option value="${i}">${f.name}</option>`).join('')}
 function addFood(){let d=data(),foods=baseFoods.concat(d.customFoods),f=foods[+foodSelect.value],q=+foodQty.value||1,v=calcFood(f,q,foodUnit.value);if(!v)return;d.foods.push({date:today(),name:f.name,qty:q,unit:foodUnit.value,k:v.k,p:v.p,c:v.c,f:v.f});save(d);renderFood()}
 function createFood(){let d=data();let f={name:newName.value.trim(),k:+newKcal.value||0,p:+newP.value||0,c:+newC.value||0,f:+newF.value||0,fiber:+newFiber.value||0,unit:newBase.value,base:newBase.value==='100 g'?'100g':newBase.value==='100 ml'?'100ml':null};if(!f.name)return alert('Escribe el nombre del alimento.');d.customFoods.push(f);save(d);newName.value='';newKcal.value='';newP.value='';newC.value='';newF.value='';newFiber.value='';fillFoodSelect();alert('Alimento guardado.')}
